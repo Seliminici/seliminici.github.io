@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Freundes-Code · Worth a Star</title>
+<link rel="icon" href="../icon.png">
+<link rel="stylesheet" href="../style.css">
+<style>
+  .code{margin:20px 0; padding:16px; border:1.5px dashed var(--rule); border-radius:6px; text-align:center}
+  .code b{display:block; font-size:24px; line-height:1.25; margin-bottom:4px}
+  .btn{display:block; margin:12px 0; padding:14px 18px; border-radius:999px; text-align:center; font-weight:800; text-decoration:none; border:0; width:100%; font:inherit; font-weight:800; cursor:pointer}
+  .btn.go{background:var(--board); color:#fff}
+  .btn.store{background:var(--star); color:var(--ink)}
+  .btn.copy{background:transparent; color:var(--stamp); text-decoration:underline}
+  .bad{color:var(--stamp)}
+</style>
+</head>
+<body>
+<!-- COMMUNITY-1: Freundes-Code ohne App. Liest die Daten nur hier im Browser aus dem #-Teil der Adresse; nichts wird gesendet, keine Cookies, keine Analyse. -->
+<main>
+<header class="site"><a href="../"><img src="../icon.png" alt=""></a><a href="../" class="brand">Worth a Star<small id="tag">Das Restaurant-Kartenspiel</small></a></header>
+<h1 id="h">Freundes-Code</h1>
+<div class="code" id="box"><b id="who">…</b><span id="sub"></span></div>
+<p id="how"></p>
+<a class="btn go" id="open" href="#">In Worth a Star öffnen</a>
+<a class="btn store" id="store" href="../">Worth a Star laden</a>
+<button class="btn copy" id="copy" type="button">Code kopieren</button>
+<p class="meta" id="note"></p>
+</main>
+<nav class="foot"><a href="../">Worth a Star</a><a href="../datenschutz.html">Datenschutz</a><a href="../privacy.html">Privacy Policy</a><a href="../impressum.html">Impressum</a></nav>
+<script>
+(function () {
+  var en = !/^de/i.test(navigator.language || '');
+  var L = en ? {
+    tag: 'The restaurant card game', h: 'Friend code', of: 'Friend code from', how: 'Download Worth a Star and scan it in the game under Profile › Scan code. Or open it directly if the game is installed.',
+    open: 'Open in Worth a Star', store: 'Get Worth a Star', copy: 'Copy code', copied: 'Copied – paste it in the game under “Paste code”.', bad: 'This code cannot be read.', soon: 'Coming soon to the App Store.',
+    note: 'This page only reads the code in your browser. Nothing is sent anywhere.'
+  } : {
+    tag: 'Das Restaurant-Kartenspiel', h: 'Freundes-Code', of: 'Freundes-Code von', how: 'Lade Worth a Star und scanne ihn im Spiel unter Profil › Code scannen. Ist das Spiel schon installiert, öffne ihn direkt.',
+    open: 'In Worth a Star öffnen', store: 'Worth a Star laden', copy: 'Code kopieren', copied: 'Kopiert – füge ihn im Spiel unter „Code einfügen“ ein.', bad: 'Dieser Code ist nicht lesbar.', soon: 'Bald im App Store.',
+    note: 'Diese Seite liest den Code nur hier in deinem Browser. Es wird nichts gesendet.'
+  };
+  if (en) document.documentElement.lang = 'en';
+  var $ = function (id) { return document.getElementById(id); };
+  $('tag').textContent = L.tag; $('h').textContent = L.h; $('how').textContent = L.how; $('open').textContent = L.open; $('store').textContent = L.store; $('copy').textContent = L.copy; $('note').textContent = L.note;
+  // Platzhalter, bis die App im App Store ist (dann die echte Adresse eintragen)
+  var STORE = '';
+  if (!STORE) { $('store').removeAttribute('href'); $('store').textContent = L.soon; } else $('store').href = STORE;
+  var code = (location.hash || '').slice(1), name = null;
+  // gleiche Prüfung wie im Spiel (src/ll-freunde.js): base64url(JSON) + '.' + Prüfsumme
+  var sum = function (s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return ((h >>> 0).toString(36) + '').padStart(6, '0').slice(-6); };
+  var m = code.match(/^([A-Za-z0-9_-]{8,600})\.([a-z0-9]{6})$/);
+  if (m && sum(m[1]) === m[2]) { try { var s = m[1].replace(/-/g, '+').replace(/_/g, '/'); s += '==='.slice((s.length + 3) % 4); var o = JSON.parse(decodeURIComponent(escape(atob(s)))); if (o && o.v === 1 && typeof o.n === 'string') name = o.n.slice(0, 16); } catch (e) {} }
+  if (name) { $('who').textContent = name; $('sub').textContent = L.of + ' ' + name; $('open').href = 'worthastar://f#' + code; document.title = L.of + ' ' + name + ' · Worth a Star'; }
+  else { $('who').textContent = L.bad; $('who').className = 'bad'; $('open').style.display = 'none'; $('copy').style.display = 'none'; }
+  $('copy').addEventListener('click', function () { var t = location.href; (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { $('note').textContent = L.copied; }, function () { prompt('', t); }); });
+})();
+</script>
+</body>
+</html>
